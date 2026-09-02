@@ -2,7 +2,7 @@ import asyncio
 from aiogram import Bot, Dispatcher, types
 from aiogram.filters import Command
 
-TOKEN = "8036652216:AAEou7rbZPHMTg8xHB..." # o'z tokeningni yozasan
+TOKEN = "8036652216:AAEou7rBzPHMTg8xHBkXLXREljZ28chb5R0"
 
 bot = Bot(token=TOKEN)
 dp = Dispatcher()
@@ -16,4 +16,3 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
-
