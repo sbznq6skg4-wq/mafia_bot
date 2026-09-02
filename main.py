@@ -4,25 +4,23 @@ from aiogram import Bot, Dispatcher, types, F
 from aiogram.filters import Command
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
-# Token
+# Token va Sening Admin ID raqaming
 TOKEN = "8036652216:AAEou7rBzPHMTg8xHBkXLXREljZ28chb5R0"
-
-# O'zingning ID raqamingni shu yerga yozasan (masalan: 123456789)
-# Agar ID raqamingni aniq bilmasang, botga /myid deb yozib bilib olasan va keyin shu yerga yozasan.
-ADMIN_ID = 4916990359  # Bu yerga o'z ID raqamingni yoz (agar xato bo'lsa /myid orqali topib yozasan)
+ADMIN_ID = 8196942761  # Sening haqiqiy ID'ing
 ADMIN_USERNAME = "@sobirvss"
 
 bot = Bot(token=TOKEN)
 dp = Dispatcher()
 
-# Bazalar va Tarjimalar lug'ati
+# Foydalanuvchilar bazasi
 users_db = {}
 
+# Tarjimalar bazasi (Uz, Ru, En)
 TRANSLATIONS = {
     "uz": {
-        "welcome": "<b>🔥 Premium Mafia Botiga Xush Kelibsiz!</b>\n\nEng kuchli, noyob rollar va qiziqarli imkoniyatlarga ega o'yin.",
+        "welcome": "<b>🔥 Premium Mafia Botiga Xush Kelibsiz!</b>\n\nEng kuchli, noyob rollar, Boys vs Girls va qiziqarli o'yinlar.",
         "profile": "<b>👤 Foydalanuvchi Profili:</b>\n\n💵 Dollar: <b>{money}</b>\n💎 Olmos: <b>{diamonds}</b>\n🏆 G'alaba: <b>{wins}</b>\n🎮 O'yinlar: <b>{games}</b>\n⭐ Status: <b>{status}</b>",
-        "shop": "<b>💎 Olmos va VIP Do'koniga Xush Kelibsiz!</b>\n\nO'yinda ustunlik qilish uchun olmos sotib oling.",
+        "shop": "<b>💎 Olmos va VIP Do'koniga Xush Kelibsiz!</b>\n\nOlmos sotib olib VIP imtiyozlarga ega bo'ling.",
         "lang_changed": "✅ Til O'zbek tiliga o'zgartirildi!",
         "btn_profile": "👤 Profil",
         "btn_shop": "💎 Olmos & Do'kon",
@@ -34,7 +32,7 @@ TRANSLATIONS = {
         "btn_stars": "⭐ Telegram Stars"
     },
     "ru": {
-        "welcome": "<b>🔥 Добро пожаловать в Premium Mafia Bot!</b>\n\nЛучшая игра с уникальными ролями и возможностями.",
+        "welcome": "<b>🔥 Добро пожаловать в Premium Mafia Bot!</b>\n\nЛучшая игра с уникальными ролями, Boys vs Girls и функциями.",
         "profile": "<b>👤 Профиль пользователя:</b>\n\n💵 Доллары: <b>{money}</b>\n💎 Алмазы: <b>{diamonds}</b>\n🏆 Победы: <b>{wins}</b>\n🎮 Игры: <b>{games}</b>\n⭐ Статус: <b>{status}</b>",
         "shop": "<b>💎 Магазин алмазов и VIP!</b>\n\nПокупайте алмазы для получения преимуществ.",
         "lang_changed": "✅ Язык изменен на Русский!",
@@ -75,25 +73,7 @@ def get_user(user_id: int):
         }
     return users_db[user_id]
 
-def get_keyboard(lang="uz"):
-    t = TRANSLATIONS.get(lang, TRANSLATIONS["uz"])
-    builder = InlineKeyboardBuilder()
-    builder.row(types.InlineKeyboardButton(text=t["btn_lang"], callback_data="set_lang"))
-    bot_info = asyncio.run(bot.get_me()) if False else None # oddiy usul
-    builder.row(types.InlineKeyboardButton(text=t["btn_group"], url=f"https://t.me/sobirvss_bot?startgroup=true")) #usernameni o'zingnikiga mosla
-    builder.row(
-        types.InlineKeyboardButton(text=t["btn_profile"], callback_data="profile"),
-        types.InlineKeyboardButton(text=t["btn_shop"], callback_data="shop")
-    )
-    builder.row(types.InlineKeyboardButton(text=t["btn_bvg"], callback_data="bvg_info"))
-    return builder.as_markup()
-
-# ID ni aniqlash uchun buyruq
-@dp.message(Command("myid"))
-async def cmd_myid(message: types.Message):
-    await message.reply(f"Sizning Telegram ID raqamingiz: <code>{message.from_user.id}</code>", parse_mode="HTML")
-
-# Start
+# 1. /start buyrug'i
 @dp.message(Command("start"))
 async def cmd_start(message: types.Message):
     user = get_user(message.from_user.id)
@@ -109,7 +89,7 @@ async def cmd_start(message: types.Message):
 
     await message.answer(t["welcome"], reply_markup=builder.as_markup(), parse_mode="HTML")
 
-# Profil
+# 2. /profile buyrug'i
 @dp.message(Command("profile"))
 async def cmd_profile(message: types.Message):
     user = get_user(message.from_user.id)
@@ -124,7 +104,7 @@ async def cmd_profile(message: types.Message):
     ) + f"\n\n<i>Creator: {ADMIN_USERNAME}</i>"
     await message.answer(text, reply_markup=builder.as_markup(), parse_mode="HTML")
 
-# Shop
+# 3. /shop buyrug'i
 @dp.message(Command("shop"))
 async def cmd_shop(message: types.Message):
     user = get_user(message.from_user.id)
@@ -137,18 +117,76 @@ async def cmd_shop(message: types.Message):
     builder.row(types.InlineKeyboardButton(text=t["btn_back"], callback_data="back_home"))
     await message.answer(t["shop"], reply_markup=builder.as_markup(), parse_mode="HTML")
 
-# Admin panel
-@dp.message(Command("admin"))
-async def cmd_admin(message: types.Message):
-    if message.from_user.id != ADMIN_ID:
-        await message.reply(f"❌ Xatolik! Sizning ID ({message.from_user.id}) adminlar ro'yxatida yo'q. Botga /myid yozib ID raqamingizni aniqlang.")
+# 4. /olmos buyrug'i
+@dp.message(Command("olmos"))
+async def cmd_olmos(message: types.Message):
+    user = get_user(message.from_user.id)
+    builder = InlineKeyboardBuilder()
+    builder.row(types.InlineKeyboardButton(text="💎 Olmos sotib olish", callback_data="shop"))
+    text = f"<b>💎 Sizning Olmos Balansingiz:</b> {user['diamonds']} ta\n\nOlmoslar orqali VIP rollarni ochishingiz mumkin!"
+    await message.answer(text, reply_markup=builder.as_markup(), parse_mode="HTML")
+
+# 5. /game buyrug'i (Guruhda o'yin boshlash)
+@dp.message(Command("game"))
+async def cmd_game(message: types.Message):
+    if message.chat.type == "private":
+        await message.reply("⚠️ Bu buyruq faqat guruhlarda ishlaydi! Botni guruhga qo'shib yozing.")
         return
     
     builder = InlineKeyboardBuilder()
-    builder.row(types.InlineKeyboardButton(text="📊 Statistikani ko'rish", callback_data="admin_stats"))
+    builder.row(types.InlineKeyboardButton(text="🎮 O'yinga qo'shilish (/join)", callback_data="join_game"))
+    
+    text = (
+        "<b>🔥 Mafia O'yini Boshlanmoqda!</b>\n\n"
+        "Qatnashish uchun pastdagi tugmani bosing yoki guruhda <code>/join</code> deb yozing."
+    )
+    await message.answer(text, reply_markup=builder.as_markup(), parse_mode="HTML")
+
+# 6. /admin buyrug'i (Faqat senga ishlaydi)
+@dp.message(Command("admin"))
+async def cmd_admin(message: types.Message):
+    if message.from_user.id != ADMIN_ID:
+        await message.reply("❌ Bu buyruq faqat bot egasi uchun!")
+        return
+    
+    builder = InlineKeyboardBuilder()
+    builder.row(types.InlineKeyboardButton(text="📊 Bot Statistikasi", callback_data="admin_stats"))
     await message.answer("<b>👑 Xush kelibsiz, Boss!</b>\nAdmin panel:", reply_markup=builder.as_markup(), parse_mode="HTML")
 
-# Til tanlash menyusi
+# 7. /pay buyrug'i
+@dp.message(Command("pay"))
+async def cmd_pay(message: types.Message):
+    if not message.reply_to_message:
+        await message.reply("⚠️ Pul o'tkazish uchun o'sha odamning xabariga reply qilib yozing! Masalan: <code>/pay 100</code>", parse_mode="HTML")
+        return
+    
+    try:
+        args = message.text.split()
+        amount = int(args[1])
+    except (IndexError, ValueError):
+        await message.reply("⚠️ Noto'g'ri format! Ishlatish: <code>/pay [summa]</code>", parse_mode="HTML")
+        return
+
+    sender_id = message.from_user.id
+    receiver_id = message.reply_to_message.from_user.id
+
+    if sender_id == receiver_id:
+        await message.reply("❌ O'zingizga pul o'tkaza olmaysiz!")
+        return
+
+    sender = get_user(sender_id)
+    if sender["money"] < amount:
+        await message.reply("❌ Hisobingizda yetarli mablag' yo'q!")
+        return
+
+    receiver = get_user(receiver_id)
+    sender["money"] -= amount
+    receiver["money"] += amount
+
+    await message.reply(f"✅ Muvaffaqiyatli! <b>{amount}</b> dollar o'tkazildi.", parse_mode="HTML")
+
+# --- CALLBACK HANDLERS ---
+
 @dp.callback_query(F.data == "set_lang")
 async def choose_lang(callback: types.CallbackQuery):
     builder = InlineKeyboardBuilder()
@@ -169,7 +207,6 @@ async def set_lang(callback: types.CallbackQuery):
     t = TRANSLATIONS[lang]
     await callback.answer(t["lang_changed"], show_alert=True)
     
-    # Asosiy oynani yangi tilda chiqarish
     builder = InlineKeyboardBuilder()
     builder.row(types.InlineKeyboardButton(text=t["btn_lang"], callback_data="set_lang"))
     builder.row(types.InlineKeyboardButton(text=t["btn_group"], url="https://t.me/sobirvss_bot?startgroup=true"))
@@ -216,7 +253,7 @@ async def pay_card_info(callback: types.CallbackQuery):
     builder.row(types.InlineKeyboardButton(text=t["btn_back"], callback_data="shop"))
     
     text = (
-        "<b>💳 Karta orqali to'lov qilish / Payment via Card:</b>\n\n"
+        "<b>💳 Karta orqali to'lov qilish:</b>\n\n"
         "Quyidagi kartalarga to'lov qilib, chekni adminga yuboring:\n\n"
         f"🇺🇿 <b>Uzcard:</b> <code>9860160623296383</code>\n"
         f"🌍 <b>Visa:</b> <code>4916990359211916</code>\n\n"
@@ -231,7 +268,7 @@ async def bvg_info_cb(callback: types.CallbackQuery):
     t = TRANSLATIONS[user["lang"]]
     builder = InlineKeyboardBuilder()
     builder.row(types.InlineKeyboardButton(text=t["btn_back"], callback_data="back_home"))
-    text = "<b>⚔️ Boys vs Girls (O'g'il bolalar Qizlarga qarshi)</b>\n\nBu rejim guruhda ishlaydi! Jamoalar bo'linib jang qilishadi."
+    text = "<b>⚔️ Boys vs Girls (O'g'il bolalar Qizlarga qarshi)</b>\n\nBu rejim guruhda jamoaviy janglar uchun mo'ljallangan!"
     await callback.message.edit_text(text, reply_markup=builder.as_markup(), parse_mode="HTML")
     await callback.answer()
 
