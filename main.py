@@ -4,6 +4,9 @@ from aiogram import Bot, Dispatcher, types, F
 from aiogram.filters import Command
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
+# commands.py faylidan funksiyani import qilamiz
+from commands import set_bot_commands
+
 # Token va Sening Admin ID raqaming
 TOKEN = "8036652216:AAEou7rBzPHMTg8xHBkXLXREljZ28chb5R0"
 ADMIN_ID = 8196942761  # Sening haqiqiy ID'ing
@@ -289,6 +292,10 @@ async def back_home_handler(callback: types.CallbackQuery):
 
 async def main():
     logging.basicConfig(level=logging.INFO)
+    
+    # Bot ishga tushishi bilan komandalarni guruh va shaxsiy chatga ajratib o'rnatadi
+    await set_bot_commands(bot)
+    
     await dp.start_polling(bot)
 
 if __name__ == "__main__":
